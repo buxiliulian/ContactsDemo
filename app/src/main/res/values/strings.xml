@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ContactsDemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="contact_search_hint">搜索联系人</string>
+</resources>
