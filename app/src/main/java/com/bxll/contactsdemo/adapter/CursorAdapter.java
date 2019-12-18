@@ -1,4 +1,4 @@
-package com.bxll.contactsdemo;
+package com.bxll.contactsdemo.adapter;
 
 import android.database.Cursor;
 

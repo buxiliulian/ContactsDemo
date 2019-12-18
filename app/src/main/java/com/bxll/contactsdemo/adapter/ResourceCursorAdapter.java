@@ -1,4 +1,4 @@
-package com.bxll.contactsdemo;
+package com.bxll.contactsdemo.adapter;
 
 import android.database.Cursor;
 import android.view.ViewGroup;
@@ -8,8 +8,8 @@ import androidx.annotation.NonNull;
 /**
  * 这层关于layoutId的抽象，因为确定了ViewHolder类型。
  */
-public abstract class LayoutCursorAdapter extends CursorAdapter<SimpleViewHolder> {
-    public LayoutCursorAdapter(Cursor cursor) {
+public abstract class ResourceCursorAdapter extends CursorAdapter<SimpleViewHolder> {
+    public ResourceCursorAdapter(Cursor cursor) {
         super(cursor);
     }
 

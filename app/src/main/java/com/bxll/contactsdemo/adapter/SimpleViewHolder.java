@@ -1,13 +1,9 @@
-package com.bxll.contactsdemo;
+package com.bxll.contactsdemo.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,28 +24,7 @@ public class SimpleViewHolder extends RecyclerView.ViewHolder {
         mViews = new SparseArray<>();
     }
 
-    public void bindText(int id, String text) {
-        View view = getView(id);
-        if (view instanceof TextView) {
-            ((TextView) view).setText(text);
-        }
-    }
-
-    public void bindImageDrawable(int id, Drawable drawable) {
-        View view = getView(id);
-        if (view instanceof ImageView) {
-            ((ImageView) view).setImageDrawable(drawable);
-        }
-    }
-
-    public void bindImageBitmap(int id, Bitmap bitmap) {
-        View view = getView(id);
-        if (view instanceof ImageView) {
-            ((ImageView) view).setImageBitmap(bitmap);
-        }
-    }
-
-    private View getView(int id) {
+    public View getView(int id) {
         View view = mViews.get(id);
         if (view == null) {
             view = itemView.findViewById(id);

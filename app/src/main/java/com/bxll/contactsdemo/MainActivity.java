@@ -3,12 +3,12 @@ package com.bxll.contactsdemo;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,11 +21,23 @@ import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, RationaleDialogFragment.Callback{
+import com.bxll.contactsdemo.ItemDecoration.IndexerDecoration;
+import com.bxll.contactsdemo.ItemDecoration.StickyHeaderDecoration;
+import com.bxll.contactsdemo.adapter.ContactsAdapter;
+import com.bxll.contactsdemo.fragment.RationaleDialogFragment;
+import com.github.promeg.pinyinhelper.Pinyin;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, RationaleDialogFragment.Callback {
     private static final String READ_CONTACTS_PERMISSION = Manifest.permission.READ_CONTACTS;
     private static final int LOADER_ID_CONTACTS = 0x01;
     private static final int REQUEST_CODE_READ_CONTACTS = 0x10;
+    private RecyclerView mContactsList;
+    private ContactsAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +45,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         initSupportActionBar();
         initSearchView();
         initFAB();
+        initRecyclerView();
+        checkAndRequestPermission();
+    }
 
+    private void initRecyclerView() {
+        mContactsList = findViewById(R.id.contact_list);
+        mContactsList.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new ContactsAdapter(null, android.R.layout.simple_list_item_1,
+                new String[]{ContactsQuery.NAME}, new int[]{android.R.id.text1});
+        mAdapter.setSortColumnName(ContactsQuery.SORT_KEY);
+        mContactsList.setAdapter(mAdapter);
+        StickyHeaderDecoration stickyHeaderDecoration = new StickyHeaderDecoration.Builder(this,
+                StickyHeaderDecoration.VERTICAL, mAdapter)
+                .create();
+        mContactsList.addItemDecoration(stickyHeaderDecoration);
+        mContactsList.addItemDecoration(new IndexerDecoration(this));
+    }
+
+    private void checkAndRequestPermission() {
         if (ContextCompat.checkSelfPermission(this, READ_CONTACTS_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, READ_CONTACTS_PERMISSION)) {
                 RationaleDialogFragment
@@ -70,6 +100,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         searchView.setBackground(getDrawable(R.drawable.search_view_bg));
         // 设置提示字符
         searchView.setQueryHint(getString(R.string.contact_search_hint));
+
+        SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(R.id.search_src_text);
+        // 提示字符为白色
+        searchAutoComplete.setHintTextColor(Color.WHITE);
+        // 输入文本字符为白色
+        searchAutoComplete.setTextColor(Color.WHITE);
+        // 默认没有焦点
+        searchAutoComplete.clearFocus();
+        searchView.clearFocus();
     }
 
     private void initFAB() {
@@ -87,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void requestReadContactsPermission() {
-        ActivityCompat.requestPermissions(this, new String[] {READ_CONTACTS_PERMISSION},
+        ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS_PERMISSION},
                 REQUEST_CODE_READ_CONTACTS);
     }
 
@@ -125,18 +164,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        return new CursorLoader(this, ContactsQuery.URI, ContactsQuery.PROJECTION,
-                null, null, ContactsQuery.SORT_KEY);
+        if (id == LOADER_ID_CONTACTS) {
+            return new CursorLoader(this, ContactsQuery.URI, ContactsQuery.PROJECTION,
+                    null, null, ContactsQuery.SORT_KEY);
+        }
+        return null;
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-
+        if (loader.getId() == LOADER_ID_CONTACTS) {
+            mAdapter.swapCursor(data);
+        }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
+        if (loader.getId() == LOADER_ID_CONTACTS) {
+            mAdapter.swapCursor(null);
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.bxll.contactsdemo;
+package com.bxll.contactsdemo.fragment;
 
 import android.app.Dialog;
 import android.content.Context;
